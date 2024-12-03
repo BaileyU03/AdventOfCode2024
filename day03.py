@@ -23,21 +23,11 @@ def part02(text):
 
 
 def multiplier(text):
-    muls = []
-    while "mul" in text:
-        mul_pos = text.find("mul")
-        try:
-            muls.append(text[mul_pos+3:mul_pos+13])
-            text = text[0:mul_pos] + text[mul_pos+3:]
-        except IndexError:
-            muls.append(text[mul_pos:])
-            text = text[0:mul_pos]
     total = 0
-    for m in muls:
-        match = re.search("^\(\d{1,3},\d{1,3}\)", m)
-        if match is not None:
-            pair = list(map(int, match.group()[1:-1].split(",")))
-            total += pair[0] * pair[1]
+    muls = re.finditer("mul\(\d{1,3},\d{1,3}\)", text)
+    for mul in muls:
+        pair = list(map(int, mul.group()[4:-1].split(",")))
+        total += pair[0] * pair[1]
     return total
 
 
