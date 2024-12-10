@@ -19,8 +19,11 @@ with open("files/day10.txt", "r") as f:
                 zero_points.append([x, y])
 
 
-total = 0
+total1 = 0
+total2 = 0
 for z in zero_points:
     nine_points = walk(topo_map, z[0], z[1], -1)
-    total += len([list(t) for t in set(tuple(element) for element in nine_points)])
-print(total)
+    total1 += len([list(t) for t in set(tuple(element) for element in nine_points)])
+    total2 += len(nine_points)
+print(total1)
+print(total2)
