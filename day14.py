@@ -1,3 +1,9 @@
+from matplotlib import pyplot as plt
+
+
+WIDTH = 101
+HEIGHT = 103
+
 robots = []
 with open("files/day14.txt", "r") as f:
     for line in f:
@@ -7,8 +13,7 @@ with open("files/day14.txt", "r") as f:
         robots.append([p, v])
 
 
-WIDTH = 101
-HEIGHT = 103
+# PART 01
 bathroom = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
 for robot in robots:
     pos = robot[0]
@@ -39,3 +44,21 @@ total = 1
 for q in quadrant_sums:
     total *= q
 print(total)
+
+
+# PART 02
+bathroom = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
+for i in range(10000):
+    if i % 10 == 0:
+        print(i)
+    new_bathroom = [l[:] for l in bathroom]
+    for robot in robots:
+        pos = robot[0]
+        vel = robot[1]
+        robot[0] = [(pos[0] + vel[0]) % WIDTH,
+                    (pos[1] + vel[1]) % HEIGHT]
+        new_bathroom[robot[0][1]][robot[0][0]] = 1
+    fig, ax = plt.subplots()
+    ax.imshow(new_bathroom, cmap="gray")
+    fig.savefig("stupid_part_2\\{}.jpg".format(i))
+    plt.close(fig)
