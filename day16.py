@@ -18,10 +18,10 @@ for y, line in enumerate(maze):
 
 vertices = all_vertices[:]
 while len(vertices) > 0:
-    poss = [v["pos"] for v in vertices]
     dists = [v['dist'] for v in vertices]
     u = vertices[min(range(len(dists)), key=dists.__getitem__)]
     vertices.remove(u)
+    poss = [v["pos"] for v in vertices]
     # Right
     if (u["pos"][0] + 1, u["pos"][1]) in poss:
         v = vertices[poss.index((u["pos"][0] + 1, u["pos"][1]))]
