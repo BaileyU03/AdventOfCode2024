@@ -1,14 +1,18 @@
-def is_possible(pattern, towels):
+from functools import cache
+
+
+@cache
+def get_total_towel_arrangements(pattern, towels):
     if pattern == "":
-        return True
+        return 1
     subpatterns = []
     for i in range(len(pattern)):
         if pattern[:i+1] in towels:
             subpatterns.append(pattern[i+1:])
+    total = 0
     for subpattern in subpatterns:
-        if is_possible(subpattern, towels):
-            return True
-    return False
+        total += get_total_towel_arrangements(subpattern, towels)
+    return total
 
 
 patterns = []
@@ -19,7 +23,10 @@ with open("files/day19.txt", "r") as f:
         patterns.append(line.split("\n")[0])
 
 
-total = 0
+total1 = 0
+total2 = 0
 for pattern in patterns:
-    total += is_possible(pattern, towels)*1
-print(total)
+    total1 += 1 if get_total_towel_arrangements(pattern, tuple(towels)) * 1 else 0
+    total2 += get_total_towel_arrangements(pattern, tuple(towels))
+print(total1)
+print(total2)
