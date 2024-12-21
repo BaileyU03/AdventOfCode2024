@@ -1,6 +1,7 @@
 from itertools import permutations
 
 
+# Helpful constants and dictionaries for getting pad information
 NUMPAD = [[ 7,  8,  9 ],
           [ 4,  5,  6 ],
           [ 1,  2,  3 ],
@@ -22,10 +23,7 @@ for y, row in enumerate(ARROWPAD):
         arrowpad_dict[(x,y)] = num
 
 
-codes = []
-
-
-
+# Functions for getting the shortest arrow codes
 def num_to_arrow(current_pos, code):
     new_pos = current_pos[:]
     arrow_string = ""
@@ -43,25 +41,18 @@ def num_to_arrow(current_pos, code):
         new_pos = (new_pos[0], new_pos[1] + 1)
         arrow_string += "v"
     perms = [''.join(p) for p in permutations(arrow_string)]
-    valid_perms = []
     if key == "A":
-        for p in perms:
-            if p[-2:] != ">>":
-                valid_perms.append(p)
+        perms = [p for p in perms if p[-2:] != ">>"]
     elif key == 0:
-        for p in perms:
-            if p[-1:] != ">":
-                valid_perms.append(p)
-    else:
-        valid_perms = perms
+        perms = [p for p in perms if p[-1:] != ">"]
     if numpad_dict[current_pos] == "A":
-        valid_perms = [p for p in valid_perms if p[:2] != "<<"]
+        perms = [p for p in perms if p[:2] != "<<"]
     elif numpad_dict[current_pos] == 0:
-        valid_perms = [p for p in valid_perms if p[:1] != "<"]
+        perms = [p for p in perms if p[:1] != "<"]
 
-
-    valid_perms = [p + "A" for p in valid_perms]
-    return valid_perms
+    perms = [p + "A" for p in perms]
+    perms = list(set(perms))
+    return perms
 
 
 def arrow_to_arrow(current_pos, code):
@@ -83,8 +74,6 @@ def arrow_to_arrow(current_pos, code):
         new_pos = (new_pos[0], new_pos[1] + 1)
         arrow_string += "v"
     perms = [''.join(p) for p in permutations(arrow_string)]
-
-    # perms = list(permutations(arrow_string))
     if arrow_string != "":
         if arrowpad_dict[current_pos] == "A":
             perms = [p for p in perms if p[:2] != "<<"]
@@ -97,6 +86,7 @@ def arrow_to_arrow(current_pos, code):
     else:
         perms = [""]
     perms = [p + "A" for p in perms]
+    perms = list(set(perms))
     x = []
     for p in perms:
         thing = arrow_to_arrow(new_pos, code[1:])
@@ -105,26 +95,26 @@ def arrow_to_arrow(current_pos, code):
     return x
 
 
-
+# Parsing
+codes = []
 with open("files/day21.txt", "r") as f:
     for line in f:
         codes.append(line.split("\n")[0])
 
-
 # Training
-s1 = {}
+num_pairs = {}
 for first in [0,1,2,3,4,5,6,7,8,9,"A"]:
     for second in [0,1,2,3,4,5,6,7,8,9,"A"]:
-        s1[str(first) + str(second)] = num_to_arrow(numpad_dict[first], second)
+        num_pairs[str(first) + str(second)] = num_to_arrow(numpad_dict[first], second)
 
-for num_pair in s1.keys():
-    new = []
-    for code in s1[num_pair]:
-        new += arrow_to_arrow(arrowpad_dict["A"], code)
-    nn = []
-    for n in new:
-        nn += arrow_to_arrow(arrowpad_dict["A"], n)
-    s1[num_pair] = min(nn, key=len)
+for num_pair in num_pairs.keys():
+    second_layer = []
+    for code in num_pairs[num_pair]:
+        second_layer += arrow_to_arrow(arrowpad_dict["A"], code)
+    third_layer = []
+    for code in second_layer:
+        third_layer += arrow_to_arrow(arrowpad_dict["A"], code)
+    num_pairs[num_pair] = min(third_layer, key=len)
 
 
 # Translating
@@ -133,6 +123,6 @@ for code in codes:
     arrows = ""
     code_with_a = "A" + code
     for i in range(len(code)):
-        arrows += s1[str(code_with_a[i]) + str(code_with_a)[i+1]]
+        arrows += num_pairs[str(code_with_a[i]) + str(code_with_a)[i + 1]]
     total += len(arrows) * int(code[:-1])
 print(total)
